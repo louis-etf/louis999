@@ -61,93 +61,97 @@ st.set_page_config(
 #########################################
 # 自訂義 CSS 樣式（採用 raw string 避免解析錯誤）
 #########################################
+// ... existing code ...
+
 st.markdown(r"""
 <style>
 [data-testid="stToolbar"] { visibility: hidden; }
 .stApp {
-    background: #f5f7fa;
-    color: #2c3e50;
+    background: #f8f9fa;
+    color: #343a40;
 }
 h1, h2, h3 {
-    color: #34495e;
+    color: #1a237e;
     font-weight: 600;
 }
 .metric-container, .stCard {
     background: white;
-    border: 1px solid #e1e8ed;
-    border-radius: 8px;
+    border: 1px solid #e3e6f0;
+    border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 .metric-label {
-    color: #7f8c8d;
+    color: #5c6b7a;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
 }
 .metric-value {
-    color: #2980b9;
+    color: #1a237e;
     font-size: 1.5rem;
     font-weight: 600;
 }
 .stNumberInput > div > div > input {
     background: white;
-    border: 1px solid #e1e8ed;
-    color: #2c3e50;
+    border: 1px solid #e3e6f0;
+    color: #343a40;
     border-radius: 8px;
 }
 .chart-container {
     background: white;
-    border: 1px solid #e1e8ed;
-    border-radius: 8px;
+    border: 1px solid #e3e6f0;
+    border-radius: 12px;
     padding: 1rem;
     margin-top: 1rem;
 }
 .analysis-section {
     margin-top: 2rem;
-    padding: 1rem;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e1e8ed;
+    padding: 1.2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e3e6f0;
 }
 .etf-info {
-    padding: 1rem;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e1e8ed;
+    padding: 1.2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e3e6f0;
     margin-bottom: 0.5rem;
 }
 .etf-code {
-    color: #2980b9;
+    color: #1a237e;
     font-weight: 600;
     font-size: 1.1rem;
 }
 .etf-name {
-    color: #7f8c8d;
+    color: #5c6b7a;
     font-size: 0.9rem;
     margin-top: 0.3rem;
 }
 /* 斗內按鈕樣式 */
 .donate-button {
     display: block;
-    background-color: #FF5722;
+    background-color: #3949ab;
     color: white;
     text-align: center;
-    padding: 10px 15px;
-    border-radius: 8px;
+    padding: 12px 18px;
+    border-radius: 12px;
     margin: 20px auto;
     font-weight: bold;
     text-decoration: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     transition: all 0.3s ease;
 }
 .donate-button:hover {
-    background-color: #E64A19;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    background-color: #283593;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     transform: translateY(-2px);
 }
 </style>
 """, unsafe_allow_html=True)
+
+// ... existing code ...
 
 #########################################
 # 爬蟲功能：從Yahoo Finance獲取ETF數據
