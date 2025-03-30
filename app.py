@@ -63,88 +63,92 @@ st.set_page_config(
 #########################################
 # 自訂義 CSS 樣式
 #########################################
+#########################################
+# 自訂義 CSS 樣式
+#########################################
 st.markdown(r"""
 <style>
 [data-testid="stToolbar"] { visibility: hidden; }
 .stApp {
-    background: #f8f9fa;
-    color: #343a40;
+    background: #f5f7fa;
+    color: #2c3e50;
 }
 h1, h2, h3 {
-    color: #1a237e;
+    color: #34495e;
     font-weight: 600;
 }
 .metric-container, .stCard {
     background: white;
-    border: 1px solid #e3e6f0;
-    border-radius: 12px;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 .metric-label {
-    color: #5c6b7a;
+    color: #7f8c8d;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
 }
 .metric-value {
-    color: #1a237e;
+    color: #2980b9;
     font-size: 1.5rem;
     font-weight: 600;
 }
 .stNumberInput > div > div > input {
     background: white;
-    border: 1px solid #e3e6f0;
-    color: #343a40;
+    border: 1px solid #e1e8ed;
+    color: #2c3e50;
     border-radius: 8px;
 }
 .chart-container {
     background: white;
-    border: 1px solid #e3e6f0;
-    border-radius: 12px;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
     padding: 1rem;
     margin-top: 1rem;
 }
 .analysis-section {
     margin-top: 2rem;
     padding: 1.2rem;
-    background: #f8f9fa;
-    border-radius: 12px;
-    border: 1px solid #e3e6f0;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e1e8ed;
 }
 .etf-info {
     padding: 1.2rem;
-    background: #f8f9fa;
-    border-radius: 12px;
-    border: 1px solid #e3e6f0;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e1e8ed;
     margin-bottom: 0.5rem;
 }
 .etf-code {
-    color: #1a237e;
+    color: #2980b9;
     font-weight: 600;
     font-size: 1.1rem;
 }
 .etf-name {
-    color: #5c6b7a;
+    color: #7f8c8d;
     font-size: 0.9rem;
     margin-top: 0.3rem;
 }
+/* 新增斗內按鈕樣式，配合原有配色 */
 .donate-button {
     display: block;
-    background-color: #3949ab;
+    background-color: #2980b9;
     color: white;
     text-align: center;
-    padding: 12px 18px;
-    border-radius: 12px;
+    padding: 10px 15px;
+    border-radius: 8px;
     margin: 20px auto;
     font-weight: bold;
     text-decoration: none;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
 }
 .donate-button:hover {
-    background-color: #283593;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    background-color: #3498db;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     transform: translateY(-2px);
 }
 </style>
