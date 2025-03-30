@@ -1440,20 +1440,6 @@ def show_sidebar():
     <a href="https://pay.soundon.fm/podcasts/48c567ce-cca7-4442-b327-ba611ad307d2" target="_blank" class="donate-button">
         ❤️ 支持創作者
     </a>
-    """, unsafe_allow_html=True)
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("<h3>資料來源</h3>", unsafe_allow_html=True)
-    st.sidebar.markdown("- 台灣證券交易所")
-    st.sidebar.markdown("- Yahoo Finance")
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-    last_update_file = os.path.join(data_dir, 'last_update.txt')
-    if os.path.exists(last_update_file):
-        with open(last_update_file, 'r') as f:
-            last_update = f.read().strip()
-        st.sidebar.markdown(f"**最後更新時間:** {last_update}")
-    else:
-        st.sidebar.markdown("**最後更新時間:** 未知")
-    st.sidebar.markdown("數據每日自動更新一次")
 
 #########################################
 # 定時任務與 ETF 數據更新功能
