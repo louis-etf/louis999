@@ -62,7 +62,9 @@ st.set_page_config(
 # 自訂義 CSS 樣式（採用 raw string 避免解析錯誤）
 #########################################
 // ... existing code ...
-
+#########################################
+# 自訂義 CSS 樣式
+#########################################
 st.markdown(r"""
 <style>
 [data-testid="stToolbar"] { visibility: hidden; }
@@ -129,7 +131,6 @@ h1, h2, h3 {
     font-size: 0.9rem;
     margin-top: 0.3rem;
 }
-/* 斗內按鈕樣式 */
 .donate-button {
     display: block;
     background-color: #3949ab;
@@ -150,9 +151,6 @@ h1, h2, h3 {
 }
 </style>
 """, unsafe_allow_html=True)
-
-// ... existing code ...
-
 #########################################
 # 爬蟲功能：從Yahoo Finance獲取ETF數據
 #########################################
