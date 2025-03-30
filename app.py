@@ -42,7 +42,7 @@ if 'portfolio' not in st.session_state:
     st.session_state.portfolio = {}
 if 'selected_etfs' not in st.session_state:
     st.session_state.selected_etfs = {}
-    
+
 #########################################
 # 設置頁面配置與自訂 CSS 樣式
 #########################################
@@ -179,14 +179,12 @@ def show_investment_calculator():
         monthly_savings = st.number_input("每月投入金額 (NT$)", min_value=0, value=st.session_state.monthly_savings, step=1000)
         expected_return = st.number_input("預期年化報酬率 (%)", min_value=0.0, max_value=20.0, value=st.session_state.expected_return, step=0.5)
         
-        # 更新 session state
         st.session_state.current_age = current_age
         st.session_state.retirement_age = retirement_age
         st.session_state.initial_investment = initial_investment
         st.session_state.monthly_savings = monthly_savings
         st.session_state.expected_return = expected_return
     
-    # 投資成長計算
     years = retirement_age - current_age
     monthly_return = (1 + expected_return/100) ** (1/12) - 1
     
@@ -240,7 +238,6 @@ class ClassifiedDividendAnalyzer:
         self.data_path = os.path.dirname(os.path.abspath(__file__))
         unified_file = os.path.join(self.data_path, 'etf_dividend_022.csv')
         try:
-            # 從統一檔案讀取價格資料
             self.price_data = try_read_csv(unified_file)
             self.price_data['股票代號'] = self.price_data['股票代號'].astype(str).str.strip()
             self.price_data['股票代號'] = self.price_data['股票代號'].apply(self.format_etf_code)
@@ -250,7 +247,6 @@ class ClassifiedDividendAnalyzer:
             st.error("讀取價格數據時發生錯誤: " + str(e))
             self.price_data = None
         try:
-            # 從統一檔案讀取配息資料
             self.data = try_read_csv(unified_file)
             self.data['股票代號'] = self.data['股票代號'].astype(str).str.strip()
             self.data['股票代號'] = self.data['股票代號'].apply(self.format_etf_code)
@@ -534,19 +530,6 @@ def create_portfolio_summary_chart(portfolio_data):
     return fig
 
 #########################################
-# 顯示資料最後更新時間
-#########################################
-def show_last_update_time():
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-    last_update_file = os.path.join(data_dir, 'last_update.txt')
-    if os.path.exists(last_update_file):
-        with open(last_update_file, 'r') as f:
-            last_update = f.read().strip()
-        st.markdown(f"<div style='text-align: right; color: #AAAAAA; font-size: 0.8rem;'>資料最後更新時間: {last_update}</div>", unsafe_allow_html=True)
-    else:
-        st.markdown("<div style='text-align: right; color: #AAAAAA; font-size: 0.8rem;'>資料更新時間: 未知</div>", unsafe_allow_html=True)
-
-#########################################
 # ETF 配息分析器頁面
 #########################################
 def show_analyzer():
@@ -555,7 +538,6 @@ def show_analyzer():
     <h1>ETF配息分析器</h1>
 </div>
 """, unsafe_allow_html=True)
-    show_last_update_time()
     analyzer = ClassifiedDividendAnalyzer()
     if analyzer.data is not None:
         col1, col2 = st.columns(2)
@@ -687,7 +669,7 @@ def show_analyzer():
         st.error("讀取配息資料失敗，請確認CSV檔案是否正確。")
 
 #########################################
-# 側邊欄：斗內按鈕與資料來源說明
+# 側邊欄：只保留捐款按鈕
 #########################################
 def show_sidebar():
     st.sidebar.markdown("<h2>投資理財工具</h2>", unsafe_allow_html=True)
@@ -696,6 +678,8 @@ def show_sidebar():
     st.sidebar.markdown("""
     <a href="https://pay.soundon.fm/podcasts/48c567ce-cca7-4442-b327-ba611ad307d2" target="_blank" class="donate-button">
         ❤️ 支持創作者
+    </a>
+    """, unsafe_allow_html=True)
 
 #########################################
 # 主程式入口：使用 st.tabs 呈現兩大功能
