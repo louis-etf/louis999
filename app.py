@@ -59,21 +59,21 @@ st.set_page_config(
 )
 
 #########################################
-# 自訂義 CSS 樣式（採用 dark theme 配色）
+# 自訂義 CSS 樣式（使用深灰背景、較淺灰容器、天空藍主題色）
 #########################################
 st.markdown(r"""
 <style>
 [data-testid="stToolbar"] { visibility: hidden; }
 .stApp {
-    background: #2C2C2C; /* 深灰背景 */
+    background: #2C2C2C;
     color: #EEEEEE;
 }
 h1, h2, h3 {
-    color: #87CEEB; /* 天空藍主題色 */
+    color: #87CEEB;
     font-weight: 600;
 }
 .metric-container, .stCard {
-    background: #3A3A3A; /* 較淺灰容器 */
+    background: #3A3A3A;
     border: 1px solid #555555;
     border-radius: 8px;
     padding: 1.5rem;
@@ -142,7 +142,7 @@ h1, h2, h3 {
     transition: all 0.3s ease;
 }
 .donate-button:hover {
-    background-color: #E64A19;
+    background-color: #16a085;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     transform: translateY(-2px);
 }
@@ -188,7 +188,7 @@ def show_investment_calculator():
         monthly_savings = st.number_input("每月投入金額 (NT$)", min_value=0, value=st.session_state.monthly_savings, step=1000)
         expected_return = st.number_input("預期年化報酬率 (%)", min_value=0.0, max_value=20.0, value=st.session_state.expected_return, step=0.5)
         
-        # 更新session state
+        # 更新 session state
         st.session_state.current_age = current_age
         st.session_state.retirement_age = retirement_age
         st.session_state.initial_investment = initial_investment
@@ -204,7 +204,7 @@ def show_investment_calculator():
     
     for i in range(1, years * 12 + 1):
         current_value = current_value * (1 + monthly_return) + monthly_savings
-        if i % 12 == 0:  # 每年記錄一次
+        if i % 12 == 0:
             values.append(current_value)
     
     with col2:
@@ -302,7 +302,6 @@ class ClassifiedDividendAnalyzer:
                 self.data.loc[self.data['股票代號'] == etf_code, '發放標籤'] = '半年配'
             elif dividend_count == 1:
                 self.data.loc[self.data['股票代號'] == etf_code, '發放標籤'] = '年配'
-        # 計算每千單位配發金額
         if '每單位配發金額(元)' in self.data.columns:
             self.data['每千單位配發金額'] = self.data['每單位配發金額(元)'] * 1000
         else:
@@ -600,10 +599,7 @@ def show_analyzer():
     <h1>ETF配息分析器</h1>
 </div>
 """, unsafe_allow_html=True)
-    
-    # 顯示最後更新時間
     show_last_update_time()
-    
     analyzer = ClassifiedDividendAnalyzer()
     if analyzer.data is not None:
         col1, col2 = st.columns([1, 1])
@@ -619,8 +615,6 @@ def show_analyzer():
                 horizontal=True,
                 key="search_method"
             )
-
-            # === 配息類型篩選 ===
             if search_method == "配息類型篩選":
                 frequency_groups = analyzer.get_etfs_by_dividend_frequency()
                 if not frequency_groups:
@@ -645,8 +639,8 @@ def show_analyzer():
                                     st.success(f"已添加 {temp_selected_etf} 到投資組合")
                                 else:
                                     st.warning("此ETF已在投資組合中")
-
-            # === 搜尋ETF功能 ===
+                        else:
+                            st.info("沒有找到符合條件的ETF")
             elif search_method == "搜尋ETF":
                 all_etfs = analyzer.get_all_etfs()
                 if not all_etfs:
@@ -658,7 +652,6 @@ def show_analyzer():
                         matched_etfs = [etf for etf in all_etfs if kw in etf or kw in analyzer.get_etf_name(etf).upper()]
                     else:
                         matched_etfs = all_etfs
-
                     if matched_etfs:
                         temp_selected_etf = st.selectbox(
                             "選擇ETF",
@@ -680,7 +673,6 @@ def show_analyzer():
                                 st.warning("此ETF已在投資組合中")
                     else:
                         st.info("沒有符合關鍵字的ETF。")
-
         with col2:
             st.markdown(r"""
 <div class="portfolio-section">
@@ -739,24 +731,21 @@ def show_analyzer():
         st.error("讀取配息資料失敗，請確認CSV檔案是否正確。")
 
 #########################################
-# 側邊欄：添加斗內按鈕與資料說明
+# 側邊欄：斗內按鈕與資料來源說明
 #########################################
 def show_sidebar():
     st.sidebar.markdown("<h2>投資理財工具</h2>", unsafe_allow_html=True)
     st.sidebar.markdown("這是一個幫助您分析ETF配息與存股投資的工具。")
-    
     st.sidebar.markdown("---")
     st.sidebar.markdown("""
     <a href="https://pay.soundon.fm/podcasts/48c567ce-cca7-4442-b327-ba611ad307d2" target="_blank" class="donate-button">
         ❤️ 支持創作者
     </a>
     """, unsafe_allow_html=True)
-    
     st.sidebar.markdown("---")
     st.sidebar.markdown("<h3>資料來源</h3>", unsafe_allow_html=True)
     st.sidebar.markdown("- 台灣證券交易所")
     st.sidebar.markdown("- Yahoo Finance")
-    
     data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
     last_update_file = os.path.join(data_dir, 'last_update.txt')
     if os.path.exists(last_update_file):
@@ -778,13 +767,14 @@ def main():
     with tabs[1]:
         show_analyzer()
 
-# 啟動定時更新任務（在單獨的線程中運行）
+#########################################
+# 定時任務與 ETF 數據更新功能
+#########################################
 def start_scheduler():
     scheduler_thread = threading.Thread(target=schedule_update)
     scheduler_thread.daemon = True
     scheduler_thread.start()
 
-# 定時任務功能：每天凌晨2點更新ETF數據
 def schedule_update():
     schedule.every().day.at("02:00").do(update_etf_data)
     data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
@@ -795,9 +785,6 @@ def schedule_update():
         schedule.run_pending()
         time.sleep(60)
 
-#########################################
-# ETF數據更新功能
-#########################################
 def update_etf_data():
     try:
         print(f"開始更新ETF數據: {datetime.datetime.now()}")
@@ -855,7 +842,7 @@ def fetch_etf_data_from_yahoo(etf_list):
                     '股票名稱': info.get('shortName', f'ETF {etf_code}'),
                     '收盤價': close_price,
                     '每單位配發金額(元)': avg_dividend,
-                    '除息日': now.strftime('%Y-%m-%d') if len(recent_dividends) > 0 else now.strftime('%Y-%m-%d')
+                    '除息日': now.strftime('%Y-%m-%d')
                 }
                 result_data.append(record)
                 print(f"成功獲取 {etf_code} 數據")
@@ -922,7 +909,7 @@ def main():
         show_analyzer()
 
 #########################################
-# 側邊欄
+# 側邊欄：斗內按鈕與資料來源說明
 #########################################
 def show_sidebar():
     st.sidebar.markdown("<h2>投資理財工具</h2>", unsafe_allow_html=True)
@@ -1125,7 +1112,351 @@ def show_sidebar():
     st.sidebar.markdown("數據每日自動更新一次")
 
 #########################################
-# 啟動定時更新任務（在單獨線程中運行）
+# 定時任務與 ETF 數據更新功能
+#########################################
+def start_scheduler():
+    scheduler_thread = threading.Thread(target=schedule_update)
+    scheduler_thread.daemon = True
+    scheduler_thread.start()
+
+def schedule_update():
+    schedule.every().day.at("02:00").do(update_etf_data)
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+    csv_path = os.path.join(data_dir, 'etf_dividend_data.csv')
+    if not os.path.exists(csv_path):
+        update_etf_data()
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
+
+def update_etf_data():
+    try:
+        print(f"開始更新ETF數據: {datetime.datetime.now()}")
+        etf_list = fetch_etf_list_from_twse()
+        if not etf_list:
+            print("無法獲取ETF列表，使用默認列表")
+            etf_list = ['0050', '0056', '0057', '00878', '00881', '00891', '00892', '00896', '00713']
+        df = fetch_etf_data_from_yahoo(etf_list)
+        if df.empty:
+            print("爬蟲獲取數據失敗，使用示例數據")
+            df = create_sample_data()
+        if not df.empty:
+            data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+            os.makedirs(data_dir, exist_ok=True)
+            csv_path = os.path.join(data_dir, 'etf_dividend_data.csv')
+            df.to_csv(csv_path, index=False, encoding='utf-8')
+            print(f"ETF數據已更新並保存到 {csv_path}")
+            with open(os.path.join(data_dir, 'last_update.txt'), 'w') as f:
+                f.write(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        else:
+            print("獲取的ETF數據為空")
+    except Exception as e:
+        print(f"更新ETF數據時出錯: {str(e)}")
+
+#########################################
+# 爬蟲功能：從Yahoo Finance獲取ETF數據
+#########################################
+def fetch_etf_data_from_yahoo(etf_list):
+    result_data = []
+    for etf_code in etf_list:
+        try:
+            if etf_code.isdigit() or (len(etf_code) >= 4 and etf_code[:4].isdigit()):
+                yahoo_code = f"{etf_code}.TW"
+            else:
+                yahoo_code = etf_code
+            etf = yf.Ticker(yahoo_code)
+            info = etf.info
+            hist = etf.history(period="1d")
+            if not hist.empty:
+                close_price = hist['Close'].iloc[-1]
+                dividends = etf.dividends
+                now = datetime.datetime.now()
+                recent_year = now - datetime.timedelta(days=365)
+                if not dividends.empty:
+                    dividend_dates = [d.to_pydatetime().replace(tzinfo=None) for d in dividends.index]
+                    recent_dividends = dividends[[d >= recent_year for d in dividend_dates]]
+                    annual_dividend = recent_dividends.sum()
+                    avg_dividend = annual_dividend / len(recent_dividends) if len(recent_dividends) > 0 else 0
+                else:
+                    annual_dividend = 0
+                    avg_dividend = 0
+                    recent_dividends = pd.Series()
+                record = {
+                    '股票代號': etf_code,
+                    '股票名稱': info.get('shortName', f'ETF {etf_code}'),
+                    '收盤價': close_price,
+                    '每單位配發金額(元)': avg_dividend,
+                    '除息日': now.strftime('%Y-%m-%d')
+                }
+                result_data.append(record)
+                print(f"成功獲取 {etf_code} 數據")
+            else:
+                print(f"無法獲取 {etf_code} 的價格數據")
+        except Exception as e:
+            print(f"獲取 {etf_code} 數據時出錯: {str(e)}")
+    if result_data:
+        df = pd.DataFrame(result_data)
+        return df
+    else:
+        return pd.DataFrame()
+
+#########################################
+# 爬蟲功能：從台灣證券交易所獲取ETF列表
+#########################################
+def fetch_etf_list_from_twse():
+    try:
+        url = "https://www.twse.com.tw/zh/page/ETF/list.html"
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        etf_list = []
+        tables = soup.find_all('table')
+        if tables:
+            for table in tables:
+                rows = table.find_all('tr')
+                for row in rows[1:]:
+                    cols = row.find_all('td')
+                    if len(cols) >= 2:
+                        etf_code = cols[0].text.strip()
+                        if etf_code and etf_code.isdigit():
+                            etf_list.append(etf_code)
+        return etf_list
+    except Exception as e:
+        print(f"從證交所獲取ETF列表時出錯: {str(e)}")
+        return []
+
+#########################################
+# 創建示例數據（當爬蟲失敗時使用）
+#########################################
+def create_sample_data():
+    sample_data = [
+        {'股票代號': '0050', '股票名稱': '元大台灣50', '收盤價': 142.50, '每單位配發金額(元)': 0.45, '除息日': '2025-03-15'},
+        {'股票代號': '0056', '股票名稱': '元大高股息', '收盤價': 35.20, '每單位配發金額(元)': 0.18, '除息日': '2025-03-10'},
+        {'股票代號': '00878', '股票名稱': '國泰永續高股息', '收盤價': 20.15, '每單位配發金額(元)': 0.12, '除息日': '2025-02-20'},
+        {'股票代號': '00881', '股票名稱': '國泰台灣5G+', '收盤價': 18.75, '每單位配發金額(元)': 0.08, '除息日': '2025-01-15'},
+        {'股票代號': '00891', '股票名稱': '中信關鍵半導體', '收盤價': 22.30, '每單位配發金額(元)': 0.10, '除息日': '2025-03-05'},
+        {'股票代號': '00892', '股票名稱': '富邦台灣半導體', '收盤價': 25.40, '每單位配發金額(元)': 0.11, '除息日': '2025-02-10'},
+        {'股票代號': '00896', '股票名稱': '中信綠能電動車', '收盤價': 16.85, '每單位配發金額(元)': 0.07, '除息日': '2025-01-25'},
+        {'股票代號': '00713', '股票名稱': '元大台灣高息低波', '收盤價': 28.90, '每單位配發金額(元)': 0.15, '除息日': '2025-03-20'},
+        {'股票代號': '00929', '股票名稱': '復華台灣科技優息', '收盤價': 19.75, '每單位配發金額(元)': 0.09, '除息日': '2025-02-15'}
+    ]
+    return pd.DataFrame(sample_data)
+
+#########################################
+# 主程式入口：使用 st.tabs 呈現兩大功能
+#########################################
+def main():
+    show_sidebar()
+    tabs = st.tabs(["存股計算", "ETF配息分析器"])
+    with tabs[0]:
+        show_investment_calculator()
+    with tabs[1]:
+        show_analyzer()
+
+#########################################
+# 側邊欄：斗內按鈕與資料來源說明
+#########################################
+def show_sidebar():
+    st.sidebar.markdown("<h2>投資理財工具</h2>", unsafe_allow_html=True)
+    st.sidebar.markdown("這是一個幫助您分析ETF配息與存股投資的工具。")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("""
+    <a href="https://pay.soundon.fm/podcasts/48c567ce-cca7-4442-b327-ba611ad307d2" target="_blank" class="donate-button">
+        ❤️ 支持創作者
+    </a>
+    """, unsafe_allow_html=True)
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("<h3>資料來源</h3>", unsafe_allow_html=True)
+    st.sidebar.markdown("- 台灣證券交易所")
+    st.sidebar.markdown("- Yahoo Finance")
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+    last_update_file = os.path.join(data_dir, 'last_update.txt')
+    if os.path.exists(last_update_file):
+        with open(last_update_file, 'r') as f:
+            last_update = f.read().strip()
+        st.sidebar.markdown(f"**最後更新時間:** {last_update}")
+    else:
+        st.sidebar.markdown("**最後更新時間:** 未知")
+    st.sidebar.markdown("數據每日自動更新一次")
+
+#########################################
+# ETF 配息分析器頁面：整合至 show_analyzer()
+#########################################
+def show_analyzer():
+    st.markdown(r"""
+<div class="page-header">
+    <h1>ETF配息分析器</h1>
+</div>
+""", unsafe_allow_html=True)
+    show_last_update_time()
+    analyzer = ClassifiedDividendAnalyzer()
+    if analyzer.data is not None:
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.markdown(r"""
+<div class="search-section">
+    <h3>搜尋與添加ETF</h3>
+</div>
+""", unsafe_allow_html=True)
+            search_method = st.radio(
+                "選擇搜尋方式",
+                ["配息類型篩選", "搜尋ETF"],
+                horizontal=True,
+                key="search_method"
+            )
+            if search_method == "配息類型篩選":
+                frequency_groups = analyzer.get_etfs_by_dividend_frequency()
+                if not frequency_groups:
+                    st.warning("目前無法取得任何ETF配息頻率資料，請確認CSV檔案是否正確。")
+                else:
+                    dividend_frequency = st.selectbox("選擇配息頻率", options=list(frequency_groups.keys()))
+                    if dividend_frequency:
+                        filtered_etfs = frequency_groups[dividend_frequency]
+                        if filtered_etfs:
+                            temp_selected_etf = st.selectbox("選擇ETF", filtered_etfs,
+                                                             format_func=lambda x: f"{x} ({analyzer.get_etf_name(x)})")
+                            price = analyzer.get_etf_price(temp_selected_etf)
+                            if price:
+                                st.markdown(r"""
+<div class="etf-info">
+    <p>當前價格: NT${:.2f}</p>
+</div>
+""".format(price), unsafe_allow_html=True)
+                            if st.button("➕ 添加到投資組合", key="btn_add_etf_search"):
+                                if temp_selected_etf not in st.session_state.selected_etfs:
+                                    st.session_state.selected_etfs.append(temp_selected_etf)
+                                    st.success(f"已添加 {temp_selected_etf} 到投資組合")
+                                else:
+                                    st.warning("此ETF已在投資組合中")
+                        else:
+                            st.info("沒有找到符合條件的ETF")
+            elif search_method == "搜尋ETF":
+                all_etfs = analyzer.get_all_etfs()
+                if not all_etfs:
+                    st.warning("目前無法取得任何ETF資料，請確認CSV檔案是否正確。")
+                else:
+                    search_keyword = st.text_input("輸入ETF代號或關鍵字", "")
+                    if search_keyword.strip():
+                        kw = search_keyword.strip().upper()
+                        matched_etfs = [etf for etf in all_etfs if kw in etf or kw in analyzer.get_etf_name(etf).upper()]
+                    else:
+                        matched_etfs = all_etfs
+                    if matched_etfs:
+                        temp_selected_etf = st.selectbox(
+                            "選擇ETF",
+                            matched_etfs,
+                            format_func=lambda x: f"{x} ({analyzer.get_etf_name(x)})"
+                        )
+                        price = analyzer.get_etf_price(temp_selected_etf)
+                        if price:
+                            st.markdown(r"""
+<div class="etf-info">
+    <p>當前價格: NT${:.2f}</p>
+</div>
+""".format(price), unsafe_allow_html=True)
+                        if st.button("➕ 添加到投資組合", key="btn_add_etf_search2"):
+                            if temp_selected_etf not in st.session_state.selected_etfs:
+                                st.session_state.selected_etfs.append(temp_selected_etf)
+                                st.success(f"已添加 {temp_selected_etf} 到投資組合")
+                            else:
+                                st.warning("此ETF已在投資組合中")
+                    else:
+                        st.info("沒有符合關鍵字的ETF。")
+        with col2:
+            st.markdown(r"""
+<div class="portfolio-section">
+    <h3>投資組合管理</h3>
+</div>
+""", unsafe_allow_html=True)
+            if st.session_state.selected_etfs:
+                for etf in st.session_state.selected_etfs:
+                    with st.container():
+                        col_info, col_qty, col_remove = st.columns([2, 1, 0.5])
+                        with col_info:
+                            st.markdown("""
+<div class="etf-info">
+    <div class="etf-code">{}</div>
+    <div class="etf-name">{}</div>
+</div>
+""".format(etf, analyzer.get_etf_name(etf)), unsafe_allow_html=True)
+                        with col_qty:
+                            default_value = st.session_state.portfolio.get(etf, 0) / 1000
+                            st.number_input("數量(千股)", min_value=0.0, value=float(default_value),
+                                            step=0.1, format="%.1f", key=f"qty_{etf}", on_change=update_portfolio)
+                        with col_remove:
+                            if st.button("🗑️", key=f"remove_{etf}"):
+                                st.session_state.selected_etfs.remove(etf)
+            else:
+                st.info("尚未添加任何ETF到投資組合")
+        
+        if st.session_state.portfolio:
+            st.markdown("---")
+            st.markdown(r"""
+<div class="analysis-section">
+    <h2>投資組合分析</h2>
+</div>
+""", unsafe_allow_html=True)
+            total_cost, portfolio_data = analyzer.calculate_investment_cost(st.session_state.portfolio)
+            if portfolio_data:
+                display_portfolio_metrics(analyzer, portfolio_data, total_cost)
+                filtered_data = analyzer.get_monthly_dividends(st.session_state.portfolio)
+                if filtered_data is not None and not filtered_data.empty:
+                    st.markdown("<h3>各ETF月度配息明細</h3>", unsafe_allow_html=True)
+                    fig = plot_monthly_dividends(filtered_data)
+                    if fig is not None:
+                        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    st.markdown(r"""
+<div class="details-section">
+    <h3>投資組合詳細資訊</h3>
+</div>
+""", unsafe_allow_html=True)
+                    st.table(pd.DataFrame(portfolio_data))
+                with col2:
+                    st.plotly_chart(create_portfolio_summary_chart(pd.DataFrame(portfolio_data)),
+                                      use_container_width=True, config={'displayModeBar': False})
+    else:
+        st.error("讀取配息資料失敗，請確認CSV檔案是否正確。")
+
+#########################################
+# 主程式入口：使用 st.tabs 呈現兩大功能
+#########################################
+def main():
+    show_sidebar()
+    tabs = st.tabs(["存股計算", "ETF配息分析器"])
+    with tabs[0]:
+        show_investment_calculator()
+    with tabs[1]:
+        show_analyzer()
+
+#########################################
+# 側邊欄：斗內按鈕與資料來源說明
+#########################################
+def show_sidebar():
+    st.sidebar.markdown("<h2>投資理財工具</h2>", unsafe_allow_html=True)
+    st.sidebar.markdown("這是一個幫助您分析ETF配息與存股投資的工具。")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("""
+    <a href="https://pay.soundon.fm/podcasts/48c567ce-cca7-4442-b327-ba611ad307d2" target="_blank" class="donate-button">
+        ❤️ 支持創作者
+    </a>
+    """, unsafe_allow_html=True)
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("<h3>資料來源</h3>", unsafe_allow_html=True)
+    st.sidebar.markdown("- 台灣證券交易所")
+    st.sidebar.markdown("- Yahoo Finance")
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+    last_update_file = os.path.join(data_dir, 'last_update.txt')
+    if os.path.exists(last_update_file):
+        with open(last_update_file, 'r') as f:
+            last_update = f.read().strip()
+        st.sidebar.markdown(f"**最後更新時間:** {last_update}")
+    else:
+        st.sidebar.markdown("**最後更新時間:** 未知")
+    st.sidebar.markdown("數據每日自動更新一次")
+
+#########################################
+# 定時任務與 ETF 數據更新功能
 #########################################
 def start_scheduler():
     scheduler_thread = threading.Thread(target=schedule_update)
